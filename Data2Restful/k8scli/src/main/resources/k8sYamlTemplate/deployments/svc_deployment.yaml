@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${apiName}
+  labels:
+    app: ${apiName}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${apiName}
+  template:
+    metadata:
+      labels:
+        app: ${apiName}
+    spec:
+      # hostNetwork: true
+      containers:
+        - name:  ${apiName}
+          image: devslave26:5000/dc-test:testdock
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          resources:
+            requests:
+              memory: 512Mi
+              cpu: 100m
+          env:
+            - name: HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: ${configMap} # cmName
+                  key: HOST
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: ${configMap}
+                  key: PORT
+            - name: DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: ${configMap}
+                  key: DATABASE
+            - name: SRCTYPE
+              valueFrom:
+                configMapKeyRef:
+                  name: ${configMap}
+                  key: SRCTYPE
+            - name: USER
+              valueFrom:
+                secretKeyRef:
+                  name: ${secret}
+                  key: USER
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ${secret}
+                  key: PASSWORD
+            - name: GROUP_NAME
+              value: ${group_name}
+      restartPolicy: Always

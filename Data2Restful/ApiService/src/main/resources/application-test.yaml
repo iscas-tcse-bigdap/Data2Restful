@@ -1,0 +1,24 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:mysql://60.245.209.102:13306/datacenter
+    username: root
+    password: Oncedi@2020
+  application:
+    name: api-service
+  mvc:
+    servlet:
+      load-on-startup: 1
+  jpa:
+    open-in-view: false
+
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: auto
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true

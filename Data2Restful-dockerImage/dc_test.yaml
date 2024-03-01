@@ -1,0 +1,63 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dc-test-demo
+  labels:
+    app: dc-test-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app:  dc-test-demo
+  template:
+    metadata:
+      labels:
+        app: dc-test-demo
+    spec:
+      # hostNetwork: true
+      containers:
+      - name:  test
+        image: devslave26:5000/dc-test:v2
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5000
+        env:
+        - name: MYSQL_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-cm # cmName
+              key: MYSQL_HOST
+        - name: MYSQL_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-cm
+              key: MYSQL_PORT
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: secret-mysql
+              key: MYSQL_USER
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name:  secret-mysql
+              key:  MYSQL_PASSWD
+        - name: MYSQL_DATABASE
+          value: 'data_center'
+      restartPolicy: Always 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-test-svc
+spec:
+  type: NodePort
+  selector:
+    app: dc-test-demo
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
+    nodePort: 30001

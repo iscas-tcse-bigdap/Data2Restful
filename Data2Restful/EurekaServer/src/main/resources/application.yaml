@@ -1,0 +1,12 @@
+server:
+  port: 9000
+
+eureka:
+  instance:
+    hostname: 60.245.208.50 # eureka所在的服务器名
+  client:
+    fetch-registry: false   #是否往服务注册中心注册自己
+    register-with-eureka: false   #是否检索服务
+    # eureka提供服务的地址    #指定服务注册中心的地址
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka

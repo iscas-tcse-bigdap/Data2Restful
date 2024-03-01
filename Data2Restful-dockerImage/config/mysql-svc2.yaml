@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-mysql-host
+spec:
+  type: ExternalName
+  externalName: 192.168.0.112
+  ports:
+    - port: 3306

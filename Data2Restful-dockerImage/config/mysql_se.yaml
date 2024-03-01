@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: secret-mysql
+  namespace: default
+type: Opaque
+data:
+  MYSQL_USER: cm9vdA==  # echo -n  root |base64
+  MYSQL_PASSWD: T25jZWRpQDIwMjA=

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN'
+  'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+<mapper namespace="apiMapper">
+
+	<select id="demo1-select" resultType="map">select * from user</select>
+
+	<mongo id="test-mongo">class.find_one()</mongo>
+
+	<mongo id="aaa-mongo">user.find_one()</mongo>
+
+</mapper>

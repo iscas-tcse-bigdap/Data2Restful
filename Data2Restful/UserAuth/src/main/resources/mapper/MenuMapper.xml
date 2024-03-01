@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.iscas.userauth.mapper.MenuMapper">
+    <select id="selectPermsByUserId" resultType="java.lang.String">
+        SELECT
+            distinct m.perms
+        FROM
+            s_user_role ur
+                left join role r on ur.role_id = r.role_id
+                left join s_role_menu rm on ur.role_id = rm.role_id
+                left join menu m on m.menu_id = rm.menu_id
+        where user_id = #{userId} and r.status = 0 and m.status = 0
+    </select>
+</mapper>

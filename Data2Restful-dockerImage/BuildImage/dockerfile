@@ -1,0 +1,18 @@
+FROM python:3.10-slim
+
+WORKDIR /apps
+
+COPY . .
+
+RUN pip install --upgrade pip --no-cache-dir
+
+WORKDIR /apps/libs
+RUN pip install --upgrade pip && \
+    pip3 install -r requirements.txt && \
+    pip3 install py_mybatis-0.1.0-py3-none-any.whl
+
+     
+
+WORKDIR /apps/app
+
+ENTRYPOINT [ "python3", "run.py" ]

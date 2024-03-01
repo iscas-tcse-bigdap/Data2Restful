@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iscas.k8scli.mapper.AppMapper" >
+    <select id="getAppInfo" resultType="AppInfo">
+        select * from appinfo where name = #{name}
+    </select>
+
+    <select id="listApps" resultType="AppInfo">
+        select * from appinfo
+    </select>
+</mapper>

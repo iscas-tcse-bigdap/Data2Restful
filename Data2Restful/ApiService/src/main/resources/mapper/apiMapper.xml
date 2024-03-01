@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iscas.apiservice.mapper.ApiMapper">
+
+    <insert id="createApi" useGeneratedKeys="true" keyProperty="apiId" keyColumn="apiId">
+        insert into Api(api_id, group_id, src_id, name, api_desc, code, url, update_time, is_public)
+        values (#{apiId}, #{groupId}, #{srcId}, #{name}, #{apiDesc}, #{code}, #{url},
+                CONVERT_TZ(NOW(), '+00:00', '+08:00'), #{isPublic})
+    </insert>
+</mapper>

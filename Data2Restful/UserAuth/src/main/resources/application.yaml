@@ -1,0 +1,24 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: UserAuth
+  datasource:
+    url: jdbc:mysql://60.245.209.102:13306/datacenter
+    username: root
+    password: Oncedi@2020
+  redis:
+    host: 60.245.208.50
+    port: 6379
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations:
+    - classpath:mapper/*.xml
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:9000/eureka/

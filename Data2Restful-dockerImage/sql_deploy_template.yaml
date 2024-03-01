@@ -1,0 +1,63 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${name}
+  labels:
+    app: ${name}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app:  ${name}
+  template:
+    metadata:
+      labels:
+        app: ${name}
+    spec:
+      # hostNetwork: true
+      containers:
+      - name:  ${name}
+        image: ${image}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: ${port}
+        env:
+        - name: MYSQL_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-cm # cmName
+              key: MYSQL_HOST
+        - name: MYSQL_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-cm
+              key: MYSQL_PORT
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: secret-mysql
+              key: MYSQL_USER
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name:  secret-mysql
+              key:  MYSQL_PASSWD
+        - name: MYSQL_DATABASE
+          value: 'data_center'
+      restartPolicy: Always 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-test-svc
+spec:
+  type: NodePort
+  selector:
+    app: app-test
+  ports:
+  - protocol: TCP
+    port: 5001
+    targetPort: 5001
+    nodePort: 30001

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <!-- 下划线匹配驼峰 -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!-- 自动匹配模式为全匹配 -->
+        <setting name="autoMappingBehavior" value="FULL"/>
+
+        <setting name="logImpl" value="org.apache.ibatis.logging.stdout.StdOutImpl"/>
+    </settings>
+</configuration>

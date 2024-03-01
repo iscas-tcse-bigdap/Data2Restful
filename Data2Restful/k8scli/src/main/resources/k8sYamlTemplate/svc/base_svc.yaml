@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${groupName}-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: ${groupName}
+  ports:
+    - name: http
+      protocol: TCP
+      port: 5000
+      targetPort: 5000

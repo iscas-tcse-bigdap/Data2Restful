@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${apiName}
+  labels:
+    app: ${apiName}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${apiName}
+  template:
+    metadata:
+      labels:
+        app: ${apiName}
+    spec:
+      # hostNetwork: true
+      containers:
+        - name:  ${apiName}
+          image: devslave26:5000/sqlapi_base:v9
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          env:
+            - name: MYSQL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: mysql-cm # cmName
+                  key: MYSQL_HOST
+            - name: MYSQL_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: mysql-cm
+                  key: MYSQL_PORT
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: secret-mysql
+                  key: MYSQL_USER
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name:  secret-mysql
+                  key:  MYSQL_PASSWD
+            - name: MYSQL_DATABASE
+              value: 'datacenter'
+            - name: APIID
+              value: ${APIID}
+      restartPolicy: Always

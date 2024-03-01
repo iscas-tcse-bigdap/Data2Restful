@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: mysql-host
+  namespace: default
+subsets:
+  - addresses:
+    - ip: 60.245.209.102
+    ports:
+      - port: 13306
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-host
+spec:
+  ports:
+    - port: 13306

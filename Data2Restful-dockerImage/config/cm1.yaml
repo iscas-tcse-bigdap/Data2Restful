@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-cm
+data:
+  # MYSQL_HOST: external-mysql-host
+  MYSQL_HOST: "60.245.209.102"
+  MYSQL_PORT: "13306"

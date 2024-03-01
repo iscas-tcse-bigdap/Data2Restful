@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!--
+    logback-spring 的文件可以基于环境配置
+
+    方式一： 可以使用springProfile 来分环境配置
+    <springProfile name="comp">
+        <property name="LOG_HOME" value="/home/houzheng/logs"/>
+    </springProfile>
+    <springProfile name="home">
+        <property name="LOG_HOME" value="D:/logs"/>
+    </springProfile>
+
+    方式二： 系统启动对应的环境spring  application.perporties,直接去配置文件里读对应的配置
+    <springProperty scope="context" name="LOG_HOME" source="logging.file.path"/>
+     -->
+
+<!--    <property resource="application.properties"/>-->
+    <!-- 通过读取spring  对应环境的properties的配置 赋值变量 -->
+    <springProperty scope="context" name="LOG_HOME" source="logging.file.path" defaultValue="." />
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="./logs" />
+
+    <!-- 通过 property 配置变量 -->
+    <property name="log.level" value="info"/>
+    <!--文件保留时间-->
+    <property name="log.maxHistory" value="15"/>
+    <!--单个文件最大大小-->
+    <property name="log.maxFileSize" value="10MB"/>
+    <!--所有日志最多占有多大硬盘-->
+    <property name="log.totalSizeCap" value="20GB"/>
+    <!-- 定义日志输出格式 -->
+    <property name="log.pattern2" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) --- [%15.15(%thread)] %cyan(%-40.40(%logger{40})) : %msg%n" />
+    <property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level --- [%15.15(%thread)] %-40.40(%logger{40}) : %msg%n" />
+
+    <!-- appender是configuration的子节点，是负责写日志的组件。 -->
+    <!-- 控制台输出 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${log.pattern2}</pattern>
+        </encoder>
+    </appender>
+
+    <!--按照每天生成日志文件-->
+    <!-- RollingFileAppender：滚动记录文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件 -->
+    <!-- 以下的大概意思是：1.先按日期存日志，日期变了，将前一天的日志文件名重命名为XXX%日期%索引，新的日志仍然是sys-out.log -->
+    <!--             2.如果日期没有发生变化，但是当前日志的文件大小超过10MB时，对当前日志进行分割 重命名-->
+    <appender name="logFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 指定日志文件的名称 -->
+        <file>${LOG_HOME}/${APP_NAME}/sys-out.log</file>
+        <!--是否追加到文件末尾,默认为true-->
+        <append>true</append>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- 过滤的级别 -->
+            <level>INFO</level>
+            <!-- 匹配时的操作：接收（记录） -->
+            <onMatch>ACCEPT</onMatch>
+            <!-- 不匹配时的操作：拒绝（不记录） -->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <!--
+        当发生滚动时，决定 RollingFileAppender 的行为，涉及文件移动和重命名
+        TimeBasedRollingPolicy： 最常用的滚动策略，它根据时间来制定滚动策略，既负责滚动也负责出发滚动。
+        -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--日志文件路径：这里%d{yyyyMMdd}表示按天分类日志-->
+            <FileNamePattern>${LOG_HOME}/${APP_NAME}/history_logs/info-%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <!--日志保留天数-->
+            <MaxHistory>${log.maxHistory}</MaxHistory>
+            <!--单个日志最大容量-->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <MaxFileSize>${log.maxFileSize}</MaxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <!--设置格式-->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${log.pattern}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/${APP_NAME}/sys-error.log</file>
+        <!-- 循环政策：基于时间创建日志文件 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 日志文件名格式 -->
+            <fileNamePattern>${LOG_HOME}/${APP_NAME}/history_logs/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 日志最大的历史 60天 -->
+            <maxHistory>60</maxHistory>
+            <!--单个日志最大容量-->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <MaxFileSize>${log.maxFileSize}</MaxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <!--编码器-->
+        <encoder>
+            <!-- pattern节点，用来设置日志的输入格式 ps:日志文件中没有设置颜色,否则颜色部分会有ESC[0:39em等乱码-->
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- 过滤的级别 -->
+            <level>ERROR</level>
+            <!-- 匹配时的操作：接收（记录） -->
+            <onMatch>ACCEPT</onMatch>
+            <!-- 不匹配时的操作：拒绝（不记录） -->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="file_debug" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/${APP_NAME}/sys-debug.log</file>
+        <!-- 循环政策：基于时间创建日志文件 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 日志文件名格式 -->
+            <fileNamePattern>${LOG_HOME}/${APP_NAME}/history_logs/debug-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 日志最大的历史 60天 -->
+            <maxHistory>60</maxHistory>
+            <!--单个日志最大容量-->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <MaxFileSize>${log.maxFileSize}</MaxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <!--编码器-->
+        <encoder>
+            <!-- pattern节点，用来设置日志的输入格式 ps:日志文件中没有设置颜色,否则颜色部分会有ESC[0:39em等乱码-->
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- 过滤的级别 -->
+            <level>DEBUG</level>
+            <!-- 匹配时的操作：接收（记录） -->
+            <onMatch>ACCEPT</onMatch>
+            <!-- 不匹配时的操作：拒绝（不记录） -->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!--
+         单独指定某个包的日志打印,级别,appender等
+         logger主要用于存放日志对象，也可以定义日志类型、级别
+             name：表示匹配的logger类型前缀，也就是包的前半部分
+             level：要记录的日志级别，包括 TRACE < DEBUG < INFO < WARN < ERROR
+             additivity：作用在于children-logger是否使用 rootLogger配置的appender进行输出，
+                         false：表示只用当前logger的appender-ref，
+                         true：表示当前logger的appender-ref和rootLogger的appender-ref都有效
+    -->
+    <!--系统模块日志级别控制-->
+    <logger name="com.example" level="debug" />
+    <!-- Spring日志级别控制  -->
+    <logger name="org.springframework" level="warn" />
+    <logger name="com.example.hspzserver.mapper" level="DEBUG" />
+
+    <root level="${log.level}">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="logFile" />
+        <appender-ref ref="file_error" />
+        <appender-ref ref="file_debug" />
+    </root>
+
+
+    <springProfile name="proc">
+        <!-- 系统模块日志级别控制  -->
+        <logger name="com.example" level="debug" />
+        <logger name="com.example.hspzserver.mapper" level="DEBUG" />
+        <!-- Spring日志级别控制  -->
+        <logger name="org.springframework" level="warn" />
+        <logger name="com.netflix.discovery.shared.resolver.aws.ConfigClusterResolver" level="warn" />
+
+        <root level="${log.level}">
+            <appender-ref ref="STDOUT" />
+            <appender-ref ref="logFile" />
+            <appender-ref ref="file_error" />
+            <appender-ref ref="file_debug" />
+        </root>
+    </springProfile>
+
+    <springProfile name="T14s">
+        <!-- 系统模块日志级别控制  -->
+        <logger name="com.example" level="debug" />
+        <logger name="com.example.hspzserver.mapper" level="DEBUG" />
+        <!-- Spring日志级别控制  -->
+        <logger name="org.springframework" level="warn" />
+        <logger name="com.netflix.discovery.shared.resolver.aws.ConfigClusterResolver" level="warn" />
+
+        <root level="${log.level}">
+            <appender-ref ref="STDOUT" />
+            <appender-ref ref="logFile" />
+            <appender-ref ref="file_error" />
+            <appender-ref ref="file_debug" />
+        </root>
+    </springProfile>
+
+
+</configuration>

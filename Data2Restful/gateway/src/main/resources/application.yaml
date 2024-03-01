@@ -1,0 +1,68 @@
+server:
+  port: 9001
+
+spring:
+  application:
+    name: dataCenter-gateway
+  datasource:
+    url: jdbc:mysql://60.245.209.102:13306/datacenter
+    username: root
+    password: Oncedi@2020
+  redis:
+    host: 60.245.208.50
+    port: 6379
+  cloud:
+    sentinel:
+      transport:
+#        port: 8719    # 此配置会在应用对应的机器上启动一个 Http Server，该 Server 会与 Sentinel 控制台做交互，比如限流规则拉取。
+        dashboard: 60.245.208.50:8858
+      scg:
+        order: -2147483648
+    gateway:
+      httpserver:
+        wiretap: true
+      httpclient:
+        pool:
+          max-connections: 1000
+        wiretap: true
+      routes:
+        - id: api-service
+          #匹配后提供服务的路由地址
+          uri: lb://api-service
+          predicates:
+            #断言,路径相匹配的进行路由
+            - Path= /api/svc/**
+
+        - id: k8scli
+          uri: lb://k8scli
+          predicates:
+            - Path= /api/k8s/**
+
+        - id: userAuth
+          uri: lb://UserAuth
+          predicates:
+            - Path= /user/**
+
+        - id: dataService
+          uri: http://60.245.208.50:32080
+          predicates:
+            - Path= /svc/**
+          filters:
+            - RewritePath=/svc/(?<segment>.*), /$\{segment}
+#            - AuthFilter
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:9000/eureka/
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    web: trace
+
+management:
+  endpoint:
